@@ -1,0 +1,5 @@
+android-app/bin/
+android-app/gen/
+android-app/debug.keystore
+android-app/*.idsig
+telegram-src/

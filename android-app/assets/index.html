@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>TelePlus Pro — Open-Source Telegram Premium</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --card: #111827;
+      --card-2: #1e293b;
+      --border: rgba(245, 158, 11, 0.28);
+      --gold: #f59e0b;
+      --gold-light: #fde68a;
+      --blue: #38bdf8;
+      --green: #10b981;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at top right, #1e1b4b 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px 14px 40px;
+    }
+    .header {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(56, 189, 248, 0.12));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    }
+    .logo-circle {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      border: 2px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--gold-light);
+      letter-spacing: -0.2px;
+    }
+    .header p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.18);
+      color: var(--gold-light);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+    .launch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .btn-launch {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 12px;
+      font-weight: 800;
+      font-size: 13.5px;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #0284c7);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, #d97706, #f59e0b);
+      color: #090d16;
+    }
+    .btn-sub {
+      font-size: 10.5px;
+      font-weight: 600;
+      opacity: 0.88;
+    }
+    .section {
+      background: var(--card);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--gold-light);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .input-group {
+      margin-bottom: 10px;
+    }
+    .input-group label {
+      display: block;
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    .input-group input, .input-group select {
+      width: 100%;
+      background: var(--card-2);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+    }
+    .input-group input:focus {
+      border-color: var(--gold);
+    }
+    .btn-save {
+      width: 100%;
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .feature-list {
+      display: grid;
+      gap: 8px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card-2);
+      padding: 10px 12px;
+      border-radius: 12px;
+      gap: 10px;
+    }
+    .feature-info h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .feature-info p {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .switch {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--gold);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .vault-box {
+      max-height: 180px;
+      overflow-y: auto;
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 12px;
+    }
+    .vault-item {
+      padding: 7px 0;
+      border-bottom: 1px solid #1e293b;
+    }
+    .vault-item:last-child {
+      border-bottom: none;
+    }
+    .tag-del {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .tag-edit {
+      background: rgba(56, 189, 248, 0.2);
+      color: #7dd3fc;
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .status-toast {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      border: 1px solid var(--gold);
+      color: var(--gold-light);
+      padding: 9px 16px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+      z-index: 9999;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo-circle">✈️</div>
+    <div>
+      <h1>TelePlus Pro <span style="font-size:12px;color:#38bdf8;">v1.0</span></h1>
+      <p>ওপেন-সোর্স টেলিগ্রাম প্রিমিয়াম ক্লায়েন্ট ও মডিউল ইঞ্জিন</p>
+      <div class="badge-row">
+        <span class="badge">👻 Ghost Mode</span>
+        <span class="badge">🗑️ Anti-Delete</span>
+        <span class="badge">🚫 No Ads</span>
+        <span class="badge">🇧🇩 Live Translator</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Launch Telegram Client Buttons -->
+  <div class="launch-grid">
+    <button class="btn-launch btn-gold" onclick="launchTelegram('https://web.telegram.org/k/')">
+      <span>🚀 Telegram চালু করুন (WebK)</span>
+      <span class="btn-sub">সবচেয়ে দ্রুত • সব প্রিমিয়াম হুক সক্রিয়</span>
+    </button>
+    <button class="btn-launch btn-primary" onclick="launchTelegram('https://web.telegram.org/a/')">
+      <span>✨ Telegram চালু করুন (WebA)</span>
+      <span class="btn-sub">মডার্ন UI • স্টিকার ও অ্যানিমেশন</span>
+    </button>
+  </div>
+
+  <!-- Custom API ID & API Hash -->
+  <div class="section">
+    <div class="section-title">
+      <span>🔑 আপনার Telegram API ID ও API Hash</span>
+      <span style="font-size:11px;color:#10b981;">my.telegram.org</span>
+    </div>
+    <div class="input-group">
+      <label>API ID (সংখ্যা):</label>
+      <input type="text" id="apiIdInput" placeholder="যেমন: 12345678" />
+    </div>
+    <div class="input-group">
+      <label>API Hash (গোপন কী):</label>
+      <input type="text" id="apiHashInput" placeholder="যেমন: eb06d4abfb49dc3eeb1aeb98ae0f581e" />
+    </div>
+    <div class="input-group">
+      <label>প্রিমিয়াম থিম (Client Theme):</label>
+      <select id="themeSelect">
+        <option value="amoled_gold">🌟 AMOLED Gold Premium</option>
+        <option value="cyberpunk">⚡ Cyberpunk Neon</option>
+        <option value="classic">🌑 Classic Telegram Dark</option>
+      </select>
+    </div>
+    <button class="btn-save" onclick="saveApiCredentials()">💾 API Key ও কনফিগারেশন সেভ করুন</button>
+  </div>
+
+  <!-- Extra Premium & Privacy Toggles -->
+  <div class="section">
+    <div class="section-title">
+      <span>💎 প্রিমিয়াম ও প্রাইভেসি ফিচারসমূহ</span>
+      <span style="font-size:11px;color:#38bdf8;">সব আনলকড</span>
+    </div>
+    <div class="feature-list" id="featureList"></div>
+  </div>
+
+  <!-- Built-in Quick Bengali Translator Box -->
+  <div class="section">
+    <div class="section-title">
+      <span>🌐 ইনস্ট্যান্ট মেসেজ অনুবাদক (Translator)</span>
+      <span style="font-size:11px;color:#fde68a;">Auto ➔ বাংলা</span>
+    </div>
+    <div class="input-group">
+      <input type="text" id="transInput" placeholder="যেকোনো বিদেশি মেসেজ এখানে পেস্ট করুন..." value="Hello! Welcome to your custom open-source Telegram Premium app." />
+    </div>
+    <button class="btn-save" style="background:linear-gradient(135deg,#2563eb,#06b6d4);margin-bottom:8px;" onclick="testTranslate()">🇧🇩 বাংলায় অনুবাদ করুন</button>
+    <div id="transOutput" style="font-size:12.5px;color:#fde68a;background:#090d16;padding:9px 11px;border-radius:8px;border:1px solid #1e293b;">
+      অনুবাদ এখানে দেখা যাবে...
+    </div>
+  </div>
+
+  <!-- Anti-Delete & Anti-Edit Vault -->
+  <div class="section">
+    <div class="section-title">
+      <span>🗑️ Anti-Delete ও Anti-Edit মেসেজ ভল্ট</span>
+      <div style="display:flex;gap:6px;">
+        <button onclick="simulateDeletedMsg()" style="background:#1e293b;color:#38bdf8;border:1px solid #38bdf8;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">+ টেস্ট</button>
+        <button onclick="clearVault()" style="background:#1e293b;color:#fca5a5;border:1px solid #ef4444;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">মুছুন</button>
+      </div>
+    </div>
+    <div class="vault-box" id="vaultBox"></div>
+  </div>
+
+  <div class="status-toast" id="toast">✓ সেভ করা হয়েছে!</div>
+
+  <script>
+    const FEATURES = [
+      { key: "ghostReadReceipts", title: "👻 Ghost Read Receipts (No Blue Tick)", desc: "মেসেজ পড়লেও অপর পাশের ইউজার ডাবল ব্লু-টিক দেখবে না" },
+      { key: "ghostTyping", title: "⌨️ Hide Typing & Recording Status", desc: "চ্যাটে টাইপ বা ভয়েস রেকর্ড করার সময় Typing... দেখাবে না" },
+      { key: "ghostOnline", title: "🟢 Stealth Offline Presence", desc: "অ্যাপ ব্যবহার করলেও অন্যদের কাছে সবসময় Offline দেখাবে" },
+      { key: "antiDelete", title: "🗑️ Anti-Delete Messages", desc: "কেউ মেসেজ ডিলিট করলে সেটি মুছে না গিয়ে Anti-Delete Vault-এ সংরক্ষিত থাকবে" },
+      { key: "antiEdit", title: "✏️ Anti-Edit Message History", desc: "কেউ মেসেজ এডিট করলে আগের আসল মেসেজটি সংরক্ষিত থাকবে" },
+      { key: "noSponsoredAds", title: "🚫 No Sponsored Ads (Ad-Blocker)", desc: "পাবলিক চ্যানেলে টেলিগ্রামের সব স্পনসরড বিজ্ঞাপন সম্পূর্ণ বন্ধ" },
+      { key: "saveRestricted", title: "🔓 Save Restricted / No-Forward Media", desc: "রেস্ট্রিক্টেড চ্যানেল থেকে টেক্সট কপি এবং মিডিয়া সেভ করার বাধা আনলক" },
+      { key: "speedBoost", title: "⚡ 4x Parallel Download Speed Boost", desc: "বড় ফাইল ও ভিডিও ৪ গুণ দ্রুত মাল্টি-স্ট্রিমে ডাউনলোড" },
+      { key: "autoTranslateBn", title: "🇧🇩 One-Tap Chat Translator (বাংলা)", desc: "চ্যাটের ভেতর ভাসমান বাটনে ১ ক্লিকে পুরো চ্যাট বাংলায় অনুবাদ" }
+    ];
+
+    const DEFAULT_CFG = {
+      apiId: "6",
+      apiHash: "eb06d4abfb49dc3eeb1aeb98ae0f581e",
+      ghostReadReceipts: true,
+      ghostTyping: true,
+      ghostOnline: true,
+      antiDelete: true,
+      antiEdit: true,
+      noSponsoredAds: true,
+      saveRestricted: true,
+      speedBoost: true,
+      autoTranslateBn: true,
+      targetLang: "bn",
+      theme: "amoled_gold"
+    };
+
+    function getConfig() {
+      try {
+        if (window.TelePlusBridge && window.TelePlusBridge.getConfigJson) {
+          const raw = window.TelePlusBridge.getConfigJson();
+          if (raw) return Object.assign({}, DEFAULT_CFG, JSON.parse(raw));
+        }
+        const saved = localStorage.getItem("teleplus_config");
+        if (saved) return Object.assign({}, DEFAULT_CFG, JSON.parse(saved));
+      } catch (e) {}
+      return Object.assign({}, DEFAULT_CFG);
+    }
+
+    function saveConfig(cfg) {
+      localStorage.setItem("teleplus_config", JSON.stringify(cfg));
+      if (window.TelePlusBridge && window.TelePlusBridge.saveConfigJson) {
+        window.TelePlusBridge.saveConfigJson(JSON.stringify(cfg));
+      }
+    }
+
+    function showToast(text) {
+      const el = document.getElementById("toast");
+      el.textContent = text;
+      el.style.opacity = "1";
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => { el.style.opacity = "0"; }, 2400);
+    }
+
+    function renderUI() {
+      const cfg = getConfig();
+      document.getElementById("apiIdInput").value = cfg.apiId || "6";
+      document.getElementById("apiHashInput").value = cfg.apiHash || "eb06d4abfb49dc3eeb1aeb98ae0f581e";
+      document.getElementById("themeSelect").value = cfg.theme || "amoled_gold";
+
+      const container = document.getElementById("featureList");
+      container.innerHTML = FEATURES.map(f => `
+        <label class="feature-item">
+          <div class="feature-info">
+            <h4>${f.title}</h4>
+            <p>${f.desc}</p>
+          </div>
+          <input type="checkbox" class="switch" data-key="${f.key}" ${cfg[f.key] ? "checked" : ""} />
+        </label>
+      `).join("");
+
+      container.querySelectorAll("input.switch").forEach(chk => {
+        chk.onchange = function() {
+          const current = getConfig();
+          current[this.getAttribute("data-key")] = this.checked;
+          saveConfig(current);
+          showToast("✓ প্রিমিয়াম ফিচার আপডেট হয়েছে!");
+        };
+      });
+
+      renderVault();
+    }
+
+    function saveApiCredentials() {
+      const cfg = getConfig();
+      cfg.apiId = document.getElementById("apiIdInput").value.trim() || "6";
+      cfg.apiHash = document.getElementById("apiHashInput").value.trim() || "eb06d4abfb49dc3eeb1aeb98ae0f581e";
+      cfg.theme = document.getElementById("themeSelect").value;
+      saveConfig(cfg);
+      showToast("✓ আপনার API ID ও API Hash সফলভাবে সংরক্ষিত হয়েছে!");
+    }
+
+    function launchTelegram(url) {
+      saveApiCredentials();
+      if (window.TelePlusBridge && window.TelePlusBridge.launchTelegramClient) {
+        window.TelePlusBridge.launchTelegramClient(url);
+      } else {
+        window.location.href = url;
+      }
+    }
+
+    async function testTranslate() {
+      const text = document.getElementById("transInput").value.trim();
+      const out = document.getElementById("transOutput");
+      if (!text) return;
+      out.textContent = "⏳ অনুবাদ করা হচ্ছে...";
+      try {
+        const res = await fetch(
+          "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=bn&dt=t&q=" +
+            encodeURIComponent(text)
+        );
+        const data = await res.json();
+        const translated = data[0].map(item => item[0]).join("");
+        out.textContent = "🇧🇩 " + translated;
+      } catch (e) {
+        out.textContent = "অনুবাদ করতে ইন্টারনেট সংযোগ প্রয়োজন।";
+      }
+    }
+
+    function getVault() {
+      try {
+        if (window.TelePlusBridge && window.TelePlusBridge.getVaultJson) {
+          const raw = window.TelePlusBridge.getVaultJson();
+          if (raw) return JSON.parse(raw);
+        }
+        const saved = localStorage.getItem("teleplus_antidelete_vault");
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+      return [];
+    }
+
+    function renderVault() {
+      const vault = getVault();
+      const box = document.getElementById("vaultBox");
+      if (!vault.length) {
+        box.innerHTML = '<div style="color:#64748b;text-align:center;padding:12px;">এখনো কোনো ডিলিট বা এডিট করা মেসেজ নেই। "+ টেস্ট" বাটনে ক্লিক করে পরীক্ষা করুন।</div>';
+        return;
+      }
+      box.innerHTML = vault.map(item => `
+        <div class="vault-item">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+            <span><span class="${item.type === 'DELETED' ? 'tag-del' : 'tag-edit'}">${item.type}</span> <b>${item.chat}</b></span>
+            <span style="color:#64748b;font-size:11px;">${item.time}</span>
+          </div>
+          <div style="color:#e2e8f0;">${item.text || (item.oldText + ' ➔ ' + item.newText)}</div>
+        </div>
+      `).join("");
+    }
+
+    function simulateDeletedMsg() {
+      const vault = getVault();
+      vault.unshift({
+        type: "DELETED",
+        chat: "Secret Group Chat",
+        mid: String(Date.now()),
+        text: "এই গোপন মেসেজটি প্রেরক ডিলিট করে দিয়েছে, কিন্তু TelePlus Anti-Delete এটি রক্ষা করেছে! 🔥",
+        time: new Date().toLocaleTimeString()
+      });
+      localStorage.setItem("teleplus_antidelete_vault", JSON.stringify(vault));
+      if (window.TelePlusBridge && window.TelePlusBridge.saveVaultJson) {
+        window.TelePlusBridge.saveVaultJson(JSON.stringify(vault));
+      }
+      renderVault();
+      showToast("🗑️ Anti-Delete মেসেজ ভল্টে সংরক্ষিত হয়েছে!");
+    }
+
+    function clearVault() {
+      localStorage.setItem("teleplus_antidelete_vault", "[]");
+      if (window.TelePlusBridge && window.TelePlusBridge.saveVaultJson) {
+        window.TelePlusBridge.saveVaultJson("[]");
+      }
+      renderVault();
+      showToast("ভল্ট পরিষ্কার করা হয়েছে।");
+    }
+
+    renderUI();
+  </script>
+</body>
+</html>

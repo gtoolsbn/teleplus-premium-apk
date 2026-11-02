@@ -1,0 +1,142 @@
+name: Build TelePlus Premium APK (Telegram-FOSS + Mod Suite)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      build_target:
+        description: 'Which APK build mode to run?'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - both
+          - fast_hybrid_apk
+          - full_telegram_foss_ndk
+      telegram_api_id:
+        description: 'Your Telegram API_ID (from my.telegram.org) - optional if set in Secrets'
+        required: false
+        default: ''
+      telegram_api_hash:
+        description: 'Your Telegram API_HASH (from my.telegram.org) - optional if set in Secrets'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  build-fast-teleplus-apk:
+    name: "⚡ Fast Build: TelePlus Pro APK (~1 min)"
+    if: ${{ github.event.inputs.build_target != 'full_telegram_foss_ndk' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android Build Tools & Platform 33
+        run: |
+          sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+
+      - name: Compile & Sign TelePlus-Pro.apk
+        env:
+          CUSTOM_API_ID: ${{ github.event.inputs.telegram_api_id || secrets.TELEGRAM_API_ID || '6' }}
+          CUSTOM_API_HASH: ${{ github.event.inputs.telegram_api_hash || secrets.TELEGRAM_API_HASH || 'eb06d4abfb49dc3eeb1aeb98ae0f581e' }}
+        run: |
+          chmod +x android-app/build_cloud.sh
+          ./android-app/build_cloud.sh
+
+      - name: Upload TelePlus-Pro APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TelePlus-Pro-APK
+          path: android-app/TelePlus-Pro.apk
+
+  build-full-telegram-foss:
+    name: "🏗️ Full Native Build: Telegram-FOSS C++/NDK Mod APK"
+    if: ${{ github.event.inputs.build_target == 'full_telegram_foss_ndk' || github.event.inputs.build_target == 'both' || github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Maximize Build Disk Space (Free ~30GB for Android NDK)
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          df -h
+
+      - name: Checkout TelePlus Patcher Repository
+        uses: actions/checkout@v4
+        with:
+          path: teleplus-mod
+
+      - name: Clone Official Telegram-FOSS Source Code with Submodules
+        run: |
+          git clone --depth=1 --recurse-submodules --shallow-submodules https://github.com/Telegram-FOSS-Team/Telegram-FOSS.git telegram-src
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK & NDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK & CMake for Telegram-FOSS
+        run: |
+          sdkmanager --install "ndk;25.2.9519653" "cmake;3.22.1" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Apply TelePlus Premium & Privacy Patches
+        env:
+          API_ID: ${{ github.event.inputs.telegram_api_id || secrets.TELEGRAM_API_ID || '6' }}
+          API_HASH: ${{ github.event.inputs.telegram_api_hash || secrets.TELEGRAM_API_HASH || 'eb06d4abfb49dc3eeb1aeb98ae0f581e' }}
+        run: |
+          python3 teleplus-mod/patches/patch_telegram_foss.py \
+            --source-dir telegram-src \
+            --api-id "$API_ID" \
+            --api-hash "$API_HASH"
+
+      - name: Prepare Release Keystore & API Keys for Telegram-FOSS
+        env:
+          API_ID: ${{ github.event.inputs.telegram_api_id || secrets.TELEGRAM_API_ID || '6' }}
+          API_HASH: ${{ github.event.inputs.telegram_api_hash || secrets.TELEGRAM_API_HASH || 'eb06d4abfb49dc3eeb1aeb98ae0f581e' }}
+        run: |
+          cd telegram-src
+          echo "$API_ID" > API_ID
+          echo "$API_HASH" > API_HASH
+          if [ ! -f TMessagesProj/config/release.keystore ]; then
+            mkdir -p TMessagesProj/config
+            keytool -genkeypair -v \
+              -keystore TMessagesProj/config/release.keystore \
+              -alias release \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -storepass android \
+              -keypass android \
+              -dname "CN=TelePlus, OU=Mobile, O=TelePlus, L=Dhaka, S=BD, C=BD"
+          fi
+
+      - name: Build Telegram-FOSS Patched APK
+        run: |
+          cd telegram-src
+          chmod +x gradlew
+          ./gradlew assembleFossDebug --no-daemon --max-workers=2
+
+      - name: Upload Native Telegram-FOSS Patched APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Telegram-FOSS-TelePlus-Mod-APK
+          path: telegram-src/TMessagesProj/build/outputs/apk/**/*.apk
